@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>통합사회 서논술형 보안 개선 퀴즈</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    header p {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+    }
+
+    .container {
+      width: min(1100px, 94%);
+      margin: 24px auto;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    .question-title {
+      margin: 12px 0 10px;
+      font-size: 24px;
+    }
+
+    .question-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      margin-top: 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #0f172a;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.14);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 15px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: #0f172a;
+      color: white;
+    }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .score-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    .score {
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .rubric-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .good {
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+    }
+
+    .middle {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .bad {
+      background: #f8fafc;
+    }
+
+    .model-answer {
+      display: none;
+      margin-top: 14px;
+      background: #0f172a;
+      color: white;
+      border-radius: 14px;
+      padding: 16px;
+      line-height: 1.7;
+    }
+
+    .side-title {
+      margin-top: 0;
+    }
+
+    .question-list button {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 8px;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+    }
+
+    .question-list button.active {
+      background: #0f172a;
+      color: white;
+    }
+
+    .notice {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .security-list {
+      padding-left: 20px;
+      line-height: 1.8;
+      color: #475569;
+    }
+
+    @media (max-width: 850px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>통합사회 서논술형 보안 개선 퀴즈</h1>
+    <p>설치 없이 실행되는 단일 HTML 버전</p>
+  </header>
+
+  <main class="container">
+    <section>
+      <div class="card">
+        <span class="badge" id="unitBadge">단원</span>
+        <h2 class="question-title" id="questionTitle">문제</h2>
+        <div class="question-box" id="questionText"></div>
+
+        <textarea id="answerInput" maxlength="1200" placeholder="여기에 답안을 작성하세요. 핵심 개념, 이유, 예시를 포함하면 점수가 더 안정적으로 나옵니다."></textarea>
+
+        <div style="display:flex; justify-content:space-between; color:#64748b; font-size:14px; margin-top:6px;">
+          <span>최소 20자 이상 작성하면 채점 가능</span>
+          <span id="charCount">0 / 1200자</span>
+        </div>
+
+        <div class="button-row">
+          <button class="primary" id="gradeBtn" onclick="gradeCurrentAnswer()">채점하기</button>
+          <button class="secondary" onclick="resetAnswer()">다시 쓰기</button>
+          <button class="secondary" onclick="toggleModelAnswer()">모범 답안 보기/숨기기</button>
+        </div>
+
+        <div class="result" id="resultBox">
+          <div class="score-box">
+            <div>
+              <div style="color:#64748b; font-size:14px;">채점 결과</div>
+              <div class="score" id="scoreText">0점</div>
+            </div>
+            <div id="levelText" class="badge">보완 필요</div>
+          </div>
+
+          <div id="rubricResult"></div>
+
+          <div class="model-answer" id="modelAnswer"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h3 class="side-title">문제 목록</h3>
+        <div class="question-list" id="questionList"></div>
+      </div>
+
+      <div class="card notice" style="margin-top:16px;">
+        <b>보안 안내</b><br />
+        이 파일은 혼자 공부하거나 발표용으로 쓰기 좋은 단일 HTML 버전입니다. 다만 진짜 시험용 보안을 원하면 정답과 채점 기준은 브라우저가 아니라 서버에 숨겨야 합니다.
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3 class="side-title">개선된 점</h3>
+        <ul class="security-list">
+          <li>답안 입력값 정리</li>
+          <li>기준별 부분 점수</li>
+          <li>비슷한 표현도 일부 인정</li>
+          <li>채점 근거 표시</li>
+          <li>모범 답안은 버튼으로만 표시</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // 문제 데이터
+    // 완전한 보안을 원하면 이 데이터는 서버에 있어야 함.
+    const QUESTIONS = [
+      {
+        unit: "단원 01",
+        title: "서술형 1",
+        prompt: "통합적 관점이 필요한 이유를 사회 현상의 특성과 연관지어 서술하시오.",
+        rubric: [
+          { label: "사회 현상이 하나의 원인으로만 설명되기 어렵다는 점을 설명함", weight: 25, keywords: ["사회 현상", "하나의 원인", "여러 원인", "복합"], synonyms: ["여러 요소", "다양한 요인", "얽혀", "복잡"] },
+          { label: "사회 현상의 복잡성과 다양한 원인의 복합적 작용을 설명함", weight: 25, keywords: ["복잡성", "다양한 원인", "복합적 작용"], synonyms: ["서로 영향", "여러 원인이 함께", "복잡하게 연결"] },
+          { label: "사실 문제와 가치 문제의 혼재를 언급함", weight: 20, keywords: ["사실 문제", "가치 문제", "가치 판단"], synonyms: ["옳고 그름", "판단", "도덕적 문제", "윤리"] },
+          { label: "통합적 관점을 통해 적절한 해결책을 찾을 수 있음을 설명함", weight: 30, keywords: ["통합적 관점", "통합적 접근", "해결책"], synonyms: ["여러 관점", "종합적으로", "함께 고려", "해결 방안"] }
+        ],
+        modelAnswer: "사회 현상은 하나의 원인으로만 설명하기 어렵고 여러 원인이 복합적으로 작용하는 복잡성을 가진다. 또한 사회 문제에는 사실 문제뿐만 아니라 가치 판단의 문제도 함께 포함되는 경우가 많다. 따라서 사회 현상을 정확히 이해하고 적절한 해결책을 찾기 위해 시간적, 공간적, 사회적, 윤리적 관점을 함께 고려하는 통합적 관점이 필요하다."
+      },
+      {
+        unit: "단원 01",
+        title: "서술형 2",
+        prompt: "사회적 관점과 윤리적 관점의 차이점을 각각의 필요성과 탐구 방법을 중심으로 비교하여 서술하시오.",
+        rubric: [
+          { label: "사회적 관점은 사회 구조, 제도, 관계를 분석한다는 점을 설명함", weight: 30, keywords: ["사회적 관점", "사회 구조", "제도", "관계"], synonyms: ["사회 제도", "집단", "사회적 영향"] },
+          { label: "윤리적 관점은 가치 판단과 바람직한 행동을 다룬다는 점을 설명함", weight: 30, keywords: ["윤리적 관점", "가치 판단", "바람직", "행동"], synonyms: ["도덕", "옳고 그름", "규범"] },
+          { label: "두 관점의 탐구 방법 차이를 비교함", weight: 25, keywords: ["비교", "차이", "탐구 방법"], synonyms: ["분석 방법", "접근 방법", "다르게"] },
+          { label: "사회 문제 해결에서 두 관점이 모두 필요함을 설명함", weight: 15, keywords: ["사회 문제", "해결", "필요"], synonyms: ["문제 해결", "함께 고려"] }
+        ],
+        modelAnswer: "사회적 관점은 사회 구조, 제도, 집단 간 관계가 개인과 사회 문제에 어떤 영향을 주는지 분석한다. 반면 윤리적 관점은 어떤 행동이나 제도가 옳고 바람직한지 가치 판단을 중심으로 살핀다. 따라서 사회 문제를 이해할 때는 제도와 구조를 분석하는 사회적 관점과, 바람직한 해결 방향을 판단하는 윤리적 관점이 함께 필요하다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 3",
+        prompt: "행복의 기준이 시대와 지역에 따라 다르게 나타나는 이유를 구체적인 예시를 들어 서술하시오.",
+        rubric: [
+          { label: "행복의 기준이 고정되어 있지 않음을 설명함", weight: 20, keywords: ["행복", "기준", "다르"], synonyms: ["달라진다", "변화한다"] },
+          { label: "시대에 따라 가치관과 생활 모습이 달라짐을 설명함", weight: 25, keywords: ["시대", "가치관", "생활"], synonyms: ["과거", "현재", "변화"] },
+          { label: "지역에 따라 환경과 문화가 다름을 설명함", weight: 25, keywords: ["지역", "환경", "문화"], synonyms: ["자연환경", "인문환경", "생활 방식"] },
+          { label: "구체적인 예시를 제시함", weight: 30, keywords: ["예", "예시", "예를 들어"], synonyms: ["예컨대", "대표적으로"] }
+        ],
+        modelAnswer: "행복의 기준은 시대와 지역의 가치관, 생활 환경, 문화에 따라 달라질 수 있다. 예를 들어 과거 농경 사회에서는 풍년과 공동체의 안정이 행복의 중요한 기준이었지만, 현대 사회에서는 개인의 자아실현이나 여가도 중요한 기준이 된다. 또한 지역에 따라 자연환경과 문화가 다르기 때문에 행복을 느끼는 조건도 다르게 나타난다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 4",
+        prompt: "동양의 유교, 불교, 도교의 행복론을 각각 핵심 개념을 중심으로 비교하여 서술하시오.",
+        rubric: [
+          { label: "유교의 행복론을 인, 예, 도덕적 수양과 연결함", weight: 30, keywords: ["유교", "인", "예", "수양"], synonyms: ["도덕", "인간관계", "군자"] },
+          { label: "불교의 행복론을 집착 제거와 해탈로 설명함", weight: 25, keywords: ["불교", "집착", "해탈"], synonyms: ["고통", "번뇌", "욕망"] },
+          { label: "도교의 행복론을 무위자연과 자연스러운 삶으로 설명함", weight: 25, keywords: ["도교", "무위자연", "자연"], synonyms: ["인위", "억지", "소박"] },
+          { label: "세 사상의 공통점과 차이점을 비교함", weight: 20, keywords: ["비교", "공통점", "차이점"], synonyms: ["서로 다르", "공통적으로"] }
+        ],
+        modelAnswer: "유교는 인과 예를 실천하고 도덕적으로 수양된 삶을 행복한 삶으로 보았다. 불교는 욕망과 집착에서 벗어나 번뇌를 없애고 해탈에 이르는 것을 중시하였다. 도교는 인위적인 욕심을 버리고 자연의 흐름에 따르는 무위자연의 삶을 행복으로 보았다. 세 사상은 모두 내면의 수양을 중시하지만, 유교는 인간관계와 도덕, 불교는 집착의 제거, 도교는 자연스러운 삶을 강조한다는 차이가 있다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 5",
+        prompt: "에피쿠로스 학파와 스토아 학파의 행복론을 쾌락과 이성의 관점에서 비교하여 서술하시오.",
+        rubric: [
+          { label: "에피쿠로스 학파의 쾌락 개념을 설명함", weight: 30, keywords: ["에피쿠로스", "쾌락", "고통"], synonyms: ["정신적 평온", "아타락시아", "소극적 쾌락"] },
+          { label: "스토아 학파의 이성과 덕을 설명함", weight: 30, keywords: ["스토아", "이성", "덕"], synonyms: ["자연의 질서", "욕망 절제", "운명"] },
+          { label: "두 사상의 차이를 비교함", weight: 25, keywords: ["비교", "차이", "행복"], synonyms: ["다르", "반면"] },
+          { label: "욕망 절제의 공통점을 언급함", weight: 15, keywords: ["욕망", "절제", "공통"], synonyms: ["과도한 욕심", "자제"] }
+        ],
+        modelAnswer: "에피쿠로스 학파는 모든 쾌락을 무조건 추구한 것이 아니라, 고통과 불안을 줄이고 정신적 평온을 얻는 삶을 행복으로 보았다. 스토아 학파는 자연의 질서에 따라 이성적으로 살고 욕망을 절제하며 덕을 실천하는 삶을 행복으로 보았다. 두 사상은 모두 지나친 욕망을 경계하지만, 에피쿠로스는 고통 없는 평온한 쾌락을, 스토아는 이성과 덕에 따르는 삶을 더 강조한다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 6",
+        prompt: "벤담의 양적 공리주의와 밀의 질적 공리주의를 비교하고, 현대 사회의 정책 결정에 주는 시사점을 서술하시오.",
+        rubric: [
+          { label: "벤담의 양적 공리주의를 최대 행복 원리로 설명함", weight: 25, keywords: ["벤담", "양적", "최대 행복"], synonyms: ["쾌락의 양", "다수의 행복"] },
+          { label: "밀의 질적 공리주의를 고급 쾌락과 연결함", weight: 25, keywords: ["밀", "질적", "고급 쾌락"], synonyms: ["쾌락의 질", "정신적 쾌락"] },
+          { label: "두 입장의 한계와 차이를 비교함", weight: 25, keywords: ["비교", "차이", "한계"], synonyms: ["문제점", "다수결", "소수"] },
+          { label: "정책 결정에서 공익과 소수 권리의 균형을 설명함", weight: 25, keywords: ["정책", "공익", "소수", "권리"], synonyms: ["사회 전체", "개인 권리", "균형"] }
+        ],
+        modelAnswer: "벤담의 양적 공리주의는 쾌락의 양을 계산하여 최대 다수의 최대 행복을 추구해야 한다고 본다. 밀의 질적 공리주의는 쾌락에도 질적 차이가 있으며 정신적이고 고급스러운 쾌락이 더 가치 있다고 보았다. 현대 사회의 정책 결정에서는 많은 사람의 이익을 고려해야 하지만, 단순히 다수의 만족만 따를 경우 소수의 권리가 침해될 수 있으므로 공익과 개인의 존엄성을 함께 고려해야 한다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 7",
+        prompt: "행복한 삶을 실현하기 위한 조건으로서 정주 환경의 의미와 중요성을 서술하시오.",
+        rubric: [
+          { label: "정주 환경의 의미를 설명함", weight: 25, keywords: ["정주 환경", "생활", "거주"], synonyms: ["살아가는 공간", "주거 환경"] },
+          { label: "안전, 편의, 쾌적성 등 조건을 제시함", weight: 25, keywords: ["안전", "편의", "쾌적"], synonyms: ["교통", "의료", "교육", "문화 시설"] },
+          { label: "삶의 질과 행복에 미치는 영향을 설명함", weight: 30, keywords: ["삶의 질", "행복", "영향"], synonyms: ["만족", "건강", "안정"] },
+          { label: "지역 격차 문제와 연결함", weight: 20, keywords: ["지역 격차", "불평등", "차이"], synonyms: ["도시와 농촌", "균형 발전"] }
+        ],
+        modelAnswer: "정주 환경은 사람들이 일정한 장소에 살면서 일상생활을 이어 가는 데 필요한 주거, 교통, 교육, 의료, 문화 시설 등을 포함한 생활 환경을 말한다. 정주 환경이 안전하고 편리하며 쾌적하면 개인의 삶의 질과 행복이 높아진다. 반대로 지역에 따라 정주 환경의 차이가 크면 교육, 의료, 문화 기회에서도 불평등이 생길 수 있으므로 균형 있는 지역 발전이 필요하다."
+      },
+      {
+        unit: "단원 03",
+        title: "서술형 8",
+        prompt: "문화권 형성에 영향을 주는 자연환경 요인과 인문환경 요인을 각각 구체적인 예시를 들어 서술하시오.",
+        rubric: [
+          { label: "자연환경 요인을 기후, 지형 등과 연결함", weight: 25, keywords: ["자연환경", "기후", "지형"], synonyms: ["강수량", "토양", "산맥"] },
+          { label: "인문환경 요인을 종교, 언어, 산업 등과 연결함", weight: 25, keywords: ["인문환경", "종교", "언어"], synonyms: ["산업", "역사", "교통"] },
+          { label: "구체적인 예시를 제시함", weight: 30, keywords: ["예", "예시", "예를 들어"], synonyms: ["대표적으로", "가령"] },
+          { label: "문화권은 여러 요인이 복합적으로 형성함을 설명함", weight: 20, keywords: ["문화권", "복합", "형성"], synonyms: ["여러 요인", "함께 작용"] }
+        ],
+        modelAnswer: "문화권은 기후, 지형 같은 자연환경과 종교, 언어, 산업, 역사 같은 인문환경이 함께 작용하여 형성된다. 예를 들어 건조 기후 지역에서는 유목 생활과 이슬람 문화가 발달한 곳이 많고, 계절풍 기후 지역에서는 벼농사를 중심으로 한 생활 문화가 나타난다. 또한 같은 자연환경이라도 종교와 역사에 따라 음식, 의복, 생활 방식이 달라질 수 있으므로 문화권은 자연환경과 인문환경이 복합적으로 작용한 결과라고 볼 수 있다."
+      },
+      {
+        unit: "단원 03",
+        title: "서술형 9",
+        prompt: "문화의 5가지 속성을 각각 설명하고, 그중 하나를 선택하여 구체적인 예시를 들어 서술하시오.",
+        rubric: [
+          { label: "문화의 공유성, 학습성, 축적성을 설명함", weight: 30, keywords: ["공유성", "학습성", "축적성"], synonyms: ["함께", "배운", "전승"] },
+          { label: "문화의 변동성과 전체성을 설명함", weight: 25, keywords: ["변동성", "전체성"], synonyms: ["변화", "서로 연결"] },
+          { label: "선택한 속성의 의미를 정확히 설명함", weight: 20, keywords: ["의미", "설명", "속성"], synonyms: ["뜻", "특징"] },
+          { label: "구체적인 예시를 제시함", weight: 25, keywords: ["예", "예시", "예를 들어"], synonyms: ["대표적으로", "가령"] }
+        ],
+        modelAnswer: "문화의 공유성은 한 사회 구성원이 문화를 함께 가진다는 것이고, 학습성은 문화가 태어날 때부터 주어지는 것이 아니라 배워 익히는 것이라는 뜻이다. 축적성은 문화가 세대를 거치며 쌓이고 발전한다는 것이며, 변동성은 시간이 지나며 문화가 변화한다는 뜻이다. 전체성은 문화 요소들이 서로 연결되어 있다는 의미이다. 예를 들어 스마트폰 사용 문화는 사람들이 함께 사용하며 공유되고, 사용법을 배우며, 기술 발전에 따라 계속 변화하므로 학습성과 변동성을 잘 보여 준다."
+      },
+      {
+        unit: "단원 03",
+        title: "서술형 10",
+        prompt: "문화 접변의 세 가지 결과를 각각 설명하고, 각각의 구체적인 예시를 들어 서술하시오.",
+        rubric: [
+          { label: "문화 병존을 설명함", weight: 25, keywords: ["문화 병존", "함께 존재"], synonyms: ["공존", "나란히"] },
+          { label: "문화 동화를 설명함", weight: 25, keywords: ["문화 동화", "흡수"], synonyms: ["사라지", "주류 문화"] },
+          { label: "문화 융합을 설명함", weight: 25, keywords: ["문화 융합", "새로운 문화"], synonyms: ["결합", "섞여"] },
+          { label: "각 결과에 맞는 예시를 제시함", weight: 25, keywords: ["예", "예시", "예를 들어"], synonyms: ["대표적으로", "가령"] }
+        ],
+        modelAnswer: "문화 접변의 결과에는 문화 병존, 문화 동화, 문화 융합이 있다. 문화 병존은 서로 다른 문화가 각각의 특징을 유지하며 함께 존재하는 것이고, 문화 동화는 한 문화가 다른 문화에 흡수되어 고유한 특징을 잃는 것이다. 문화 융합은 서로 다른 문화 요소가 결합하여 새로운 문화가 만들어지는 것이다. 예를 들어 한 지역에서 전통 음식과 외국 음식이 함께 소비되면 문화 병존이고, 이주민이 기존 언어와 생활 방식만 사용하게 되면 문화 동화이며, 불고기 피자처럼 서로 다른 음식 문화가 결합하면 문화 융합이다."
+      },
+      {
+        unit: "단원 04",
+        title: "서술형 11",
+        prompt: "문화 상대주의, 자문화 중심주의, 문화 사대주의를 비교하고, 각각의 문제점을 서술하시오.",
+        rubric: [
+          { label: "문화 상대주의의 의미를 설명함", weight: 25, keywords: ["문화 상대주의", "맥락", "이해"], synonyms: ["그 사회의 기준", "상대적으로"] },
+          { label: "자문화 중심주의의 의미와 문제점을 설명함", weight: 25, keywords: ["자문화 중심주의", "우월", "편견"], synonyms: ["자기 문화", "차별"] },
+          { label: "문화 사대주의의 의미와 문제점을 설명함", weight: 25, keywords: ["문화 사대주의", "외래 문화", "열등"], synonyms: ["남의 문화", "무비판적 수용"] },
+          { label: "세 태도를 비교하여 균형 있게 서술함", weight: 25, keywords: ["비교", "문제점", "균형"], synonyms: ["차이", "바람직"] }
+        ],
+        modelAnswer: "문화 상대주의는 문화를 그 사회의 역사와 환경, 가치 기준 속에서 이해하려는 태도이다. 그러나 이를 극단적으로 적용하면 인권 침해까지 문화라는 이유로 정당화할 수 있다. 자문화 중심주의는 자기 문화를 우월하다고 보고 다른 문화를 낮게 평가하는 태도로, 문화적 편견과 차별을 낳을 수 있다. 문화 사대주의는 외래 문화를 무조건 우수하게 여기고 자기 문화를 낮게 보는 태도로, 자기 문화의 가치를 잃게 만들 수 있다. 따라서 다른 문화를 존중하되 보편적 인권과 윤리도 함께 고려해야 한다."
+      },
+      {
+        unit: "단원 04",
+        title: "서술형 12",
+        prompt: "보편 윤리의 의미와 필요성을 극단적 문화 상대주의와 연관지어 서술하시오.",
+        rubric: [
+          { label: "보편 윤리의 의미를 설명함", weight: 25, keywords: ["보편 윤리", "인간", "존엄"], synonyms: ["인권", "공통 가치"] },
+          { label: "극단적 문화 상대주의의 한계를 설명함", weight: 30, keywords: ["극단적 문화 상대주의", "한계", "정당화"], synonyms: ["인권 침해", "무조건 인정"] },
+          { label: "문화 존중과 인권 보호의 균형을 설명함", weight: 25, keywords: ["문화 존중", "인권", "균형"], synonyms: ["존중", "보호", "조화"] },
+          { label: "구체적인 사례나 적용 방향을 제시함", weight: 20, keywords: ["사례", "예", "적용"], synonyms: ["예를 들어", "해결"] }
+        ],
+        modelAnswer: "보편 윤리는 문화와 시대가 달라도 인간이라면 존중받아야 할 기본 가치와 도덕 원칙을 말한다. 문화 상대주의는 다른 문화를 그 사회의 맥락에서 이해하게 해 주지만, 극단적으로 적용하면 명예살인이나 여성 차별처럼 인간의 존엄성을 침해하는 행위까지 문화라는 이유로 정당화할 수 있다. 따라서 문화를 존중하되 생명, 자유, 평등, 인권 같은 보편 윤리를 기준으로 문제를 판단해야 한다."
+      },
+      {
+        unit: "단원 05",
+        title: "서술형 13",
+        prompt: "다문화 사회로의 진입이 가져오는 변화를 긍정적 측면과 부정적 측면으로 나누어 서술하시오.",
+        rubric: [
+          { label: "다문화 사회의 의미를 설명함", weight: 20, keywords: ["다문화 사회", "다양한 문화", "공존"], synonyms: ["이주민", "외국인", "문화 다양성"] },
+          { label: "긍정적 측면을 설명함", weight: 30, keywords: ["긍정", "문화 다양성", "교류"], synonyms: ["창의성", "경제 활성화", "새로운 문화"] },
+          { label: "부정적 측면을 설명함", weight: 30, keywords: ["부정", "갈등", "차별"], synonyms: ["편견", "소통 문제", "배제"] },
+          { label: "갈등 해결의 필요성을 제시함", weight: 20, keywords: ["해결", "존중", "소통"], synonyms: ["이해", "정책", "교육"] }
+        ],
+        modelAnswer: "다문화 사회는 서로 다른 문화적 배경을 가진 사람들이 함께 살아가는 사회이다. 긍정적으로는 다양한 문화가 공존하면서 문화 교류가 활발해지고, 새로운 아이디어와 창의성이 생기며 노동력과 경제 활동에도 도움이 될 수 있다. 그러나 언어와 생활 방식의 차이로 갈등이 생기거나, 이주민과 소수 문화에 대한 편견과 차별이 나타날 수 있다. 따라서 다문화 사회에서는 문화 다양성을 존중하고 차별을 줄이기 위한 교육과 제도적 노력이 필요하다."
+      },
+      {
+        unit: "단원 05",
+        title: "서술형 14",
+        prompt: "다문화 사회의 갈등 해결을 위한 개인적 차원과 사회적 차원의 노력을 각각 서술하시오.",
+        rubric: [
+          { label: "개인적 차원의 노력을 제시함", weight: 30, keywords: ["개인적 차원", "존중", "편견"], synonyms: ["이해", "소통", "차별하지"] },
+          { label: "사회적 차원의 노력을 제시함", weight: 30, keywords: ["사회적 차원", "제도", "정책"], synonyms: ["교육", "지원", "법"] },
+          { label: "갈등 원인을 문화 차이와 차별로 설명함", weight: 20, keywords: ["갈등", "문화 차이", "차별"], synonyms: ["언어", "편견", "배제"] },
+          { label: "상호 존중과 사회 통합을 연결함", weight: 20, keywords: ["상호 존중", "사회 통합", "공존"], synonyms: ["함께 살아", "통합"] }
+        ],
+        modelAnswer: "다문화 사회의 갈등은 문화 차이, 언어 문제, 편견과 차별에서 생길 수 있다. 개인적 차원에서는 다른 문화를 무시하지 않고 이해하려는 태도를 가지며, 일상에서 차별적 표현을 사용하지 않고 소통하려는 노력이 필요하다. 사회적 차원에서는 다문화 교육, 언어 지원, 차별 금지 제도, 이주민의 사회 참여 보장 같은 정책이 필요하다. 이러한 노력이 함께 이루어질 때 서로 다른 문화가 공존하고 사회 통합도 가능해진다."
+      },
+      {
+        unit: "단원 02",
+        title: "서술형 15",
+        prompt: "플라톤과 아리스토텔레스의 행복론을 비교하여 공통점과 차이점을 서술하시오.",
+        rubric: [
+          { label: "플라톤의 행복론을 이데아와 영혼의 조화로 설명함", weight: 30, keywords: ["플라톤", "이데아", "영혼"], synonyms: ["선의 이데아", "조화", "철학"] },
+          { label: "아리스토텔레스의 행복론을 덕과 중용으로 설명함", weight: 30, keywords: ["아리스토텔레스", "덕", "중용"], synonyms: ["이성", "실천", "습관"] },
+          { label: "공통점을 설명함", weight: 20, keywords: ["공통점", "이성", "덕"], synonyms: ["둘 다", "도덕적 삶"] },
+          { label: "차이점을 설명함", weight: 20, keywords: ["차이점", "현실", "이데아"], synonyms: ["다르게", "실천"] }
+        ],
+        modelAnswer: "플라톤은 참된 행복을 선의 이데아를 인식하고 영혼이 조화를 이루는 삶으로 보았다. 아리스토텔레스는 인간의 고유한 기능인 이성을 잘 발휘하고, 중용의 덕을 실천하는 삶을 행복으로 보았다. 두 사상가는 모두 이성과 덕을 중시했다는 공통점이 있지만, 플라톤은 초월적 진리인 이데아의 인식을 강조했고 아리스토텔레스는 현실 속에서 덕을 습관적으로 실천하는 삶을 강조했다는 차이가 있다."
+      },
+      {
+        unit: "단원 01 심화",
+        title: "서술형 16",
+        prompt: "청소년 스마트폰 과의존 문제를 시간적, 공간적, 사회적, 윤리적 관점에서 통합적으로 분석하시오.",
+        rubric: [
+          { label: "시간적 관점에서 원인이나 변화 과정을 설명함", weight: 25, keywords: ["시간적 관점", "변화", "과거", "현재"], synonyms: ["발달", "흐름", "증가"] },
+          { label: "공간적 관점에서 장소와 환경 차이를 설명함", weight: 20, keywords: ["공간적 관점", "장소", "환경"], synonyms: ["지역", "가정", "학교"] },
+          { label: "사회적 관점에서 제도와 관계를 분석함", weight: 25, keywords: ["사회적 관점", "제도", "관계"], synonyms: ["친구", "가족", "미디어", "플랫폼"] },
+          { label: "윤리적 관점에서 책임과 바람직한 태도를 제시함", weight: 30, keywords: ["윤리적 관점", "책임", "바람직"], synonyms: ["절제", "권리", "의무"] }
+        ],
+        modelAnswer: "청소년 스마트폰 과의존은 스마트폰 보급과 온라인 콘텐츠 발달이라는 시간적 변화 속에서 심화되었다. 공간적으로는 가정, 학교, 지역의 여가 환경과 학습 환경에 따라 사용 양상이 달라진다. 사회적으로는 또래 관계, 가족 소통, 플랫폼의 추천 알고리즘, 학교 규칙 등이 영향을 미친다. 윤리적으로는 개인의 자기 절제와 함께 기업의 책임 있는 서비스 설계, 가정과 학교의 지도도 필요하다. 따라서 이 문제는 한 가지 원인으로만 볼 것이 아니라 여러 관점을 함께 고려해야 한다."
+      },
+      {
+        unit: "단원 01 심화",
+        title: "서술형 17",
+        prompt: "기후 변화 문제를 사실 문제와 가치 문제로 구분하고, 두 측면을 함께 고려해야 하는 이유를 서술하시오.",
+        rubric: [
+          { label: "사실 문제를 과학적 자료와 원인 분석으로 설명함", weight: 25, keywords: ["사실 문제", "자료", "원인"], synonyms: ["과학", "온실가스", "기온"] },
+          { label: "가치 문제를 책임과 정의의 문제로 설명함", weight: 30, keywords: ["가치 문제", "책임", "정의"], synonyms: ["공정", "윤리", "세대"] },
+          { label: "두 측면을 구분하여 서술함", weight: 20, keywords: ["구분", "사실", "가치"], synonyms: ["다르", "측면"] },
+          { label: "정책 결정에서 둘 다 필요함을 설명함", weight: 25, keywords: ["정책", "해결", "함께 고려"], synonyms: ["대책", "종합", "결정"] }
+        ],
+        modelAnswer: "기후 변화에서 사실 문제는 지구 평균 기온 상승, 온실가스 배출량, 이상 기후 증가처럼 과학적 자료를 통해 확인할 수 있는 부분이다. 가치 문제는 누가 더 책임을 져야 하는지, 현재 세대와 미래 세대 사이의 부담을 어떻게 나눌지, 경제 발전과 환경 보호 중 무엇을 우선할지와 관련된다. 기후 변화 대책은 정확한 자료 분석만으로 충분하지 않고 공정성과 책임에 대한 판단도 필요하므로 사실 문제와 가치 문제를 함께 고려해야 한다."
+      },
+      {
+        unit: "단원 02 심화",
+        title: "서술형 18",
+        prompt: "행복한 삶을 위해 경제적 조건이 필요한 이유와, 경제적 조건만으로 행복이 완성될 수 없는 이유를 함께 서술하시오.",
+        rubric: [
+          { label: "경제적 조건의 필요성을 기본 생활 보장과 연결함", weight: 30, keywords: ["경제적 조건", "기본 생활", "필요"], synonyms: ["소득", "주거", "의식주"] },
+          { label: "경제적 조건만으로 행복이 완성되지 않음을 설명함", weight: 30, keywords: ["만으로", "행복", "완성"], synonyms: ["충분하지", "한계"] },
+          { label: "관계, 자아실현, 건강 등 비경제적 조건을 제시함", weight: 25, keywords: ["관계", "자아실현", "건강"], synonyms: ["여가", "공동체", "정신적"] },
+          { label: "균형 잡힌 결론을 제시함", weight: 15, keywords: ["균형", "함께", "조화"], synonyms: ["동시에", "종합"] }
+        ],
+        modelAnswer: "경제적 조건은 의식주, 의료, 교육 등 기본 생활을 보장하기 때문에 행복한 삶의 중요한 기반이 된다. 그러나 돈이나 소득만으로 행복이 완성되는 것은 아니다. 인간은 타인과의 관계, 건강, 여가, 자아실현, 공동체 속에서의 인정도 필요로 하기 때문이다. 따라서 경제적 안정은 행복의 필요 조건이 될 수 있지만, 충분 조건은 아니며 물질적 조건과 정신적·사회적 조건이 균형을 이루어야 한다."
+      },
+      {
+        unit: "단원 02 심화",
+        title: "서술형 19",
+        prompt: "아리스토텔레스의 중용 개념을 활용하여 학교생활에서 발생할 수 있는 갈등 상황의 해결 방안을 서술하시오.",
+        rubric: [
+          { label: "중용의 의미를 지나침과 모자람 사이의 적절함으로 설명함", weight: 30, keywords: ["중용", "지나침", "모자람"], synonyms: ["적절", "균형"] },
+          { label: "학교생활 갈등 상황을 구체적으로 제시함", weight: 20, keywords: ["학교", "갈등", "상황"], synonyms: ["친구", "수업", "생활"] },
+          { label: "중용을 적용한 해결 방안을 제시함", weight: 30, keywords: ["해결 방안", "적용", "중용"], synonyms: ["실천", "조절", "대화"] },
+          { label: "덕과 습관의 중요성을 설명함", weight: 20, keywords: ["덕", "습관", "실천"], synonyms: ["반복", "태도", "인격"] }
+        ],
+        modelAnswer: "아리스토텔레스의 중용은 지나침과 모자람 사이에서 이성에 따라 적절한 태도를 선택하는 것이다. 예를 들어 친구와 의견 충돌이 있을 때 무조건 참는 것은 소극적이고, 감정적으로 화를 내는 것은 지나친 태도이다. 이때 상대의 의견을 듣고 자신의 생각을 차분히 말하는 것이 중용에 가까운 해결 방식이다. 이러한 태도는 한 번의 행동으로 끝나는 것이 아니라 반복적인 실천과 습관을 통해 덕으로 자리 잡을 수 있다."
+      },
+      {
+        unit: "단원 03 심화",
+        title: "서술형 20",
+        prompt: "세계화가 지역 문화에 미치는 영향을 문화 다양성의 확대와 문화 획일화의 위험이라는 두 측면에서 서술하시오.",
+        rubric: [
+          { label: "세계화의 의미를 설명함", weight: 20, keywords: ["세계화", "교류", "확대"], synonyms: ["국경", "연결", "이동"] },
+          { label: "문화 다양성 확대의 긍정적 측면을 설명함", weight: 30, keywords: ["문화 다양성", "확대", "긍정"], synonyms: ["교류", "선택", "새로운 문화"] },
+          { label: "문화 획일화의 위험을 설명함", weight: 30, keywords: ["문화 획일화", "위험", "지역 문화"], synonyms: ["사라지", "동질화", "상업화"] },
+          { label: "지역 문화 보존과 개방의 균형을 제시함", weight: 20, keywords: ["보존", "개방", "균형"], synonyms: ["전통", "창조적 계승"] }
+        ],
+        modelAnswer: "세계화는 국가와 지역 사이의 교류를 확대하여 다양한 문화를 접할 기회를 늘린다. 이로 인해 사람들은 음식, 음악, 의복 등에서 더 많은 선택지를 갖게 되고 새로운 문화가 만들어질 수 있다. 그러나 세계적으로 영향력이 큰 문화가 빠르게 확산되면 지역 고유의 문화가 약화되고 생활 양식이 비슷해지는 문화 획일화가 나타날 수 있다. 따라서 세계 문화를 개방적으로 받아들이되 지역 문화의 가치를 보존하고 창조적으로 계승하려는 노력이 필요하다."
+      },
+      {
+        unit: "단원 03 심화",
+        title: "서술형 21",
+        prompt: "문화의 전체성을 고려할 때, 한 사회의 결혼 문화 변화가 가족, 경제, 가치관에 미칠 수 있는 영향을 서술하시오.",
+        rubric: [
+          { label: "문화의 전체성 의미를 설명함", weight: 25, keywords: ["전체성", "문화 요소", "연결"], synonyms: ["상호 관련", "서로 영향"] },
+          { label: "결혼 문화 변화와 가족 구조 변화를 연결함", weight: 25, keywords: ["결혼 문화", "가족", "변화"], synonyms: ["가족 형태", "1인 가구", "출산"] },
+          { label: "경제와 사회 제도에 미치는 영향을 설명함", weight: 25, keywords: ["경제", "제도", "영향"], synonyms: ["주거", "육아", "복지"] },
+          { label: "가치관 변화까지 종합적으로 서술함", weight: 25, keywords: ["가치관", "종합", "삶"], synonyms: ["개인주의", "평등", "인식"] }
+        ],
+        modelAnswer: "문화의 전체성은 한 사회의 문화 요소들이 따로 떨어져 있지 않고 서로 연결되어 있다는 뜻이다. 결혼 문화가 변화하면 가족 형태와 출산, 자녀 양육 방식이 달라질 수 있다. 또한 주거 수요, 육아 제도, 복지 정책, 소비 방식 같은 경제와 사회 제도에도 영향을 준다. 더 나아가 개인의 자유, 성평등, 가족의 의미에 대한 가치관도 변화한다. 따라서 결혼 문화 변화는 하나의 문화 요소 변화에 그치지 않고 사회 전체의 여러 영역과 연결된다."
+      },
+      {
+        unit: "단원 04 심화",
+        title: "서술형 22",
+        prompt: "극단적 문화 상대주의가 인권 침해를 정당화할 수 있는 이유를 사례와 함께 비판적으로 서술하시오.",
+        rubric: [
+          { label: "문화 상대주의와 극단적 문화 상대주의를 구분함", weight: 25, keywords: ["문화 상대주의", "극단적", "구분"], synonyms: ["차이", "맥락"] },
+          { label: "인권 침해 정당화의 위험을 설명함", weight: 30, keywords: ["인권 침해", "정당화", "위험"], synonyms: ["차별", "폭력", "억압"] },
+          { label: "구체적인 사례를 제시함", weight: 20, keywords: ["사례", "예", "예를 들어"], synonyms: ["가령", "대표적으로"] },
+          { label: "보편 윤리와 문화 존중의 균형을 제시함", weight: 25, keywords: ["보편 윤리", "문화 존중", "균형"], synonyms: ["인간 존엄", "비판적 수용"] }
+        ],
+        modelAnswer: "문화 상대주의는 다른 문화를 그 사회의 맥락에서 이해하려는 태도이지만, 극단적 문화 상대주의는 모든 문화를 무조건 인정해야 한다고 본다는 점에서 문제가 있다. 이 경우 여성 차별, 아동 학대, 명예살인처럼 인간의 기본권을 침해하는 행위도 전통이라는 이유로 정당화될 수 있다. 문화는 존중되어야 하지만 인간의 생명과 존엄, 자유와 평등을 침해하는 행위까지 허용할 수는 없다. 따라서 문화 이해와 보편 윤리 사이의 균형이 필요하다."
+      },
+      {
+        unit: "단원 04 심화",
+        title: "서술형 23",
+        prompt: "자문화 중심주의가 국가 간 갈등이나 사회 내부 차별로 이어질 수 있는 과정을 설명하고, 이를 극복하기 위한 태도를 서술하시오.",
+        rubric: [
+          { label: "자문화 중심주의의 의미를 설명함", weight: 25, keywords: ["자문화 중심주의", "자기 문화", "우월"], synonyms: ["자국 문화", "중심"] },
+          { label: "국가 간 갈등 또는 차별로 이어지는 과정을 설명함", weight: 30, keywords: ["갈등", "차별", "과정"], synonyms: ["편견", "배척", "충돌"] },
+          { label: "구체적인 예시나 상황을 제시함", weight: 20, keywords: ["예", "상황", "사례"], synonyms: ["예를 들어", "가령"] },
+          { label: "문화 상대주의와 상호 존중의 태도를 제시함", weight: 25, keywords: ["문화 상대주의", "상호 존중", "극복"], synonyms: ["이해", "소통", "평등"] }
+        ],
+        modelAnswer: "자문화 중심주의는 자신의 문화를 우월하게 여기고 다른 문화를 낮게 평가하는 태도이다. 이러한 태도는 다른 나라의 생활 방식이나 종교, 언어를 열등하게 보게 만들어 국가 간 갈등을 일으킬 수 있고, 사회 내부에서는 이주민이나 소수 문화 집단에 대한 차별로 이어질 수 있다. 예를 들어 특정 언어와 음식 문화만 정상이라고 생각하면 다른 문화를 가진 사람을 배척하게 된다. 이를 극복하려면 다른 문화를 그 사회의 맥락에서 이해하고, 모든 문화 구성원을 동등하게 존중하는 태도가 필요하다."
+      },
+      {
+        unit: "단원 05 심화",
+        title: "서술형 24",
+        prompt: "다문화 사회에서 동화주의와 다문화주의 정책의 차이를 비교하고, 바람직한 사회 통합 방향을 서술하시오.",
+        rubric: [
+          { label: "동화주의의 의미와 한계를 설명함", weight: 30, keywords: ["동화주의", "주류 문화", "한계"], synonyms: ["적응", "흡수", "소수 문화"] },
+          { label: "다문화주의의 의미와 장점을 설명함", weight: 30, keywords: ["다문화주의", "문화 다양성", "존중"], synonyms: ["공존", "인정", "다양"] },
+          { label: "두 정책의 차이를 비교함", weight: 20, keywords: ["비교", "차이", "정책"], synonyms: ["반면", "다르게"] },
+          { label: "바람직한 사회 통합 방향을 제시함", weight: 20, keywords: ["사회 통합", "방향", "평등"], synonyms: ["참여", "권리", "소통"] }
+        ],
+        modelAnswer: "동화주의는 이주민이나 소수 집단이 주류 문화에 적응하도록 요구하는 정책 방향이다. 사회 질서를 빠르게 통합할 수 있다는 장점이 있지만, 소수 문화의 정체성과 권리를 약화시킬 수 있다. 다문화주의는 다양한 문화가 공존하고 존중받아야 한다고 보는 입장으로, 문화 다양성을 보장하지만 집단 간 분리나 갈등이 생기지 않도록 소통이 필요하다. 바람직한 사회 통합은 소수 문화를 무시하지 않으면서도 모든 구성원이 공통의 시민적 가치와 권리를 공유하도록 하는 방향이어야 한다."
+      },
+      {
+        unit: "단원 05 심화",
+        title: "서술형 25",
+        prompt: "이주민에 대한 편견이 형성되는 원인을 사회적 관점에서 분석하고, 이를 줄이기 위한 교육적·제도적 방안을 서술하시오.",
+        rubric: [
+          { label: "편견 형성 원인을 사회 구조와 인식으로 분석함", weight: 30, keywords: ["편견", "사회 구조", "인식"], synonyms: ["고정관념", "차별", "미디어"] },
+          { label: "교육적 방안을 제시함", weight: 25, keywords: ["교육", "다문화 교육", "이해"], synonyms: ["학교", "수업", "체험"] },
+          { label: "제도적 방안을 제시함", weight: 25, keywords: ["제도", "법", "정책"], synonyms: ["차별 금지", "지원", "권리"] },
+          { label: "사회 통합과 연결함", weight: 20, keywords: ["사회 통합", "공존", "존중"], synonyms: ["평등", "참여", "소통"] }
+        ],
+        modelAnswer: "이주민에 대한 편견은 낯선 문화에 대한 무지, 미디어의 부정적 이미지, 경제적 경쟁에 대한 불안, 사회적 고정관념 등에서 형성될 수 있다. 이를 줄이기 위해 학교에서는 다문화 교육과 문화 교류 활동을 통해 서로 다른 문화를 이해하도록 해야 한다. 제도적으로는 차별 금지 규정, 언어 지원, 노동권 보호, 지역사회 참여 기회 확대가 필요하다. 이러한 교육적·제도적 노력이 함께 이루어질 때 이주민도 사회 구성원으로 존중받고 사회 통합이 가능해진다."
+      },
+      {
+        unit: "단원 06 심화",
+        title: "서술형 26",
+        prompt: "지역 축제가 지역 정체성 형성과 지역 경제에 미치는 영향을 긍정적 측면과 한계로 나누어 서술하시오.",
+        rubric: [
+          { label: "지역 정체성 형성 효과를 설명함", weight: 25, keywords: ["지역 정체성", "축제", "공동체"], synonyms: ["소속감", "전통", "자부심"] },
+          { label: "지역 경제 활성화 효과를 설명함", weight: 25, keywords: ["지역 경제", "관광", "활성화"], synonyms: ["상권", "일자리", "소득"] },
+          { label: "상업화나 획일화 같은 한계를 설명함", weight: 25, keywords: ["한계", "상업화", "획일화"], synonyms: ["환경 문제", "일회성", "예산 낭비"] },
+          { label: "지속 가능한 운영 방안을 제시함", weight: 25, keywords: ["지속 가능", "주민 참여", "보존"], synonyms: ["균형", "개선", "지역 문화"] }
+        ],
+        modelAnswer: "지역 축제는 지역의 역사와 문화를 드러내어 주민들의 소속감과 자부심을 높이고 지역 정체성을 형성하는 데 도움이 된다. 또한 관광객을 유치하여 상권을 활성화하고 일자리와 소득을 늘리는 효과도 있다. 그러나 축제가 지나치게 상업화되면 지역 고유성이 약해지고, 비슷한 축제가 반복되어 획일화될 수 있으며 예산 낭비나 환경 문제도 생길 수 있다. 따라서 지역 축제는 주민 참여를 바탕으로 지역 문화를 보존하면서 지속 가능하게 운영되어야 한다."
+      },
+      {
+        unit: "단원 06 심화",
+        title: "서술형 27",
+        prompt: "도시 재개발이 주민의 삶에 미치는 영향을 공간적 관점과 윤리적 관점에서 분석하시오.",
+        rubric: [
+          { label: "공간적 관점에서 토지 이용과 생활 공간 변화를 설명함", weight: 30, keywords: ["공간적 관점", "토지 이용", "생활 공간"], synonyms: ["주거", "교통", "지역"] },
+          { label: "윤리적 관점에서 권리와 공정성을 설명함", weight: 30, keywords: ["윤리적 관점", "권리", "공정"], synonyms: ["정의", "주거권", "약자"] },
+          { label: "긍정적 효과와 부정적 영향을 함께 제시함", weight: 25, keywords: ["긍정", "부정", "영향"], synonyms: ["개선", "갈등", "쫓겨남"] },
+          { label: "주민 참여와 보상 등 해결 방향을 제시함", weight: 15, keywords: ["주민 참여", "보상", "해결"], synonyms: ["의견", "대책", "보호"] }
+        ],
+        modelAnswer: "도시 재개발은 공간적 관점에서 낡은 주거지와 기반 시설을 개선하고 토지 이용을 효율적으로 바꾸는 과정이다. 하지만 재개발로 집값과 임대료가 상승하면 기존 주민이 살던 지역에서 밀려날 수 있다. 윤리적 관점에서는 개발 이익뿐만 아니라 주민의 주거권, 공정한 보상, 사회적 약자의 보호가 중요하다. 따라서 재개발은 생활 환경 개선이라는 긍정적 효과를 살리면서도 주민 참여를 보장하고 충분한 보상과 이주 대책을 마련하는 방식으로 이루어져야 한다."
+      },
+      {
+        unit: "단원 06 심화",
+        title: "서술형 28",
+        prompt: "지역 격차가 개인의 행복에 미치는 영향을 교육, 의료, 교통 조건과 연결하여 서술하시오.",
+        rubric: [
+          { label: "지역 격차의 의미를 설명함", weight: 20, keywords: ["지역 격차", "차이", "불균형"], synonyms: ["불평등", "수도권", "지방"] },
+          { label: "교육 조건과 행복을 연결함", weight: 25, keywords: ["교육", "기회", "행복"], synonyms: ["학교", "학습", "진로"] },
+          { label: "의료와 교통 조건을 설명함", weight: 30, keywords: ["의료", "교통", "접근성"], synonyms: ["병원", "대중교통", "이동"] },
+          { label: "해결 방향을 제시함", weight: 25, keywords: ["해결", "균형 발전", "정책"], synonyms: ["지원", "확충", "개선"] }
+        ],
+        modelAnswer: "지역 격차는 지역에 따라 생활 기회와 시설 수준이 다르게 나타나는 현상이다. 교육 시설과 학습 기회가 부족한 지역에서는 학생의 진로 선택과 성장 가능성이 제한될 수 있다. 의료 시설이 부족하면 건강을 지키기 어렵고, 교통이 불편하면 학교, 직장, 문화 시설에 접근하기 힘들어진다. 이러한 조건은 개인의 삶의 질과 행복에 직접적인 영향을 준다. 따라서 교육, 의료, 교통 인프라를 고르게 확충하고 지역 균형 발전 정책을 추진해야 한다."
+      },
+      {
+        unit: "단원 07 심화",
+        title: "서술형 29",
+        prompt: "사회적 약자의 행복을 보장하기 위해 국가와 시민이 해야 할 역할을 각각 서술하시오.",
+        rubric: [
+          { label: "사회적 약자의 의미를 설명함", weight: 20, keywords: ["사회적 약자", "불리", "취약"], synonyms: ["노인", "장애인", "아동", "저소득층"] },
+          { label: "국가의 역할을 복지와 제도 보장으로 설명함", weight: 30, keywords: ["국가", "복지", "제도"], synonyms: ["지원", "법", "정책"] },
+          { label: "시민의 역할을 존중과 참여로 설명함", weight: 25, keywords: ["시민", "존중", "참여"], synonyms: ["배려", "봉사", "연대"] },
+          { label: "인간 존엄과 행복을 연결함", weight: 25, keywords: ["인간 존엄", "행복", "권리"], synonyms: ["기본권", "평등", "삶의 질"] }
+        ],
+        modelAnswer: "사회적 약자는 경제적, 신체적, 사회적 조건 때문에 생활에서 불리한 위치에 놓인 사람들을 말한다. 국가는 이들의 행복을 보장하기 위해 복지 제도, 교육과 의료 지원, 차별 금지 법과 같은 제도를 마련해야 한다. 시민은 사회적 약자를 시혜의 대상으로만 보지 않고 동등한 권리를 가진 구성원으로 존중해야 하며, 배려와 참여, 연대를 실천해야 한다. 사회적 약자의 행복 보장은 인간 존엄과 평등을 실현하는 중요한 조건이다."
+      },
+      {
+        unit: "단원 07 심화",
+        title: "서술형 30",
+        prompt: "공정한 사회가 개인의 행복에 중요한 이유를 기회균등과 결과의 불평등 문제를 중심으로 서술하시오.",
+        rubric: [
+          { label: "공정한 사회의 의미를 설명함", weight: 25, keywords: ["공정", "기회균등", "정당"], synonyms: ["공평", "절차", "평등"] },
+          { label: "기회균등과 행복의 관계를 설명함", weight: 25, keywords: ["기회균등", "행복", "가능성"], synonyms: ["노력", "성취", "희망"] },
+          { label: "결과의 불평등 문제를 설명함", weight: 25, keywords: ["결과", "불평등", "격차"], synonyms: ["소득", "빈부", "차이"] },
+          { label: "제도적 보완의 필요성을 제시함", weight: 25, keywords: ["제도", "보완", "복지"], synonyms: ["지원", "재분배", "교육"] }
+        ],
+        modelAnswer: "공정한 사회는 개인이 출신, 성별, 지역, 경제적 배경 때문에 부당하게 차별받지 않고 자신의 능력을 발휘할 기회를 얻는 사회이다. 기회균등이 보장되면 사람들은 노력하면 삶을 개선할 수 있다는 희망을 가지며, 이는 개인의 행복과 사회적 신뢰를 높인다. 하지만 기회가 형식적으로만 같고 결과의 격차가 지나치게 크면 빈곤과 좌절이 심화될 수 있다. 따라서 공정한 사회를 위해서는 교육 기회 보장, 복지, 사회 안전망 같은 제도적 보완이 필요하다."
+      },
+      {
+        unit: "단원 07 심화",
+        title: "서술형 31",
+        prompt: "환경 정의의 관점에서 환경 오염 피해가 특정 지역이나 계층에 집중되는 문제를 비판적으로 서술하시오.",
+        rubric: [
+          { label: "환경 정의의 의미를 설명함", weight: 25, keywords: ["환경 정의", "공정", "환경"], synonyms: ["정의", "평등", "권리"] },
+          { label: "환경 피해의 지역·계층 집중을 설명함", weight: 30, keywords: ["피해", "지역", "계층", "집중"], synonyms: ["저소득층", "주변 지역", "불평등"] },
+          { label: "윤리적 문제를 비판함", weight: 25, keywords: ["윤리", "비판", "책임"], synonyms: ["부당", "인권", "건강권"] },
+          { label: "해결 방안을 제시함", weight: 20, keywords: ["해결", "참여", "정책"], synonyms: ["규제", "보상", "감시"] }
+        ],
+        modelAnswer: "환경 정의는 환경의 이익과 부담이 사회 구성원에게 공정하게 분배되어야 한다는 관점이다. 현실에서는 쓰레기 처리장, 공장, 오염 시설이 특정 지역이나 저소득층 거주지에 집중되어 환경 피해가 불평등하게 나타날 수 있다. 이는 건강권과 삶의 질을 침해하며, 사회적 약자에게 더 큰 부담을 지운다는 점에서 윤리적으로 문제가 있다. 따라서 환경 정책을 결정할 때 주민 참여를 보장하고, 오염 규제와 피해 보상, 공정한 시설 배치가 이루어져야 한다."
+      },
+      {
+        unit: "단원 07 심화",
+        title: "서술형 32",
+        prompt: "인공지능 기술의 확산이 인간의 행복에 미칠 수 있는 영향을 긍정적 측면과 윤리적 쟁점으로 나누어 서술하시오.",
+        rubric: [
+          { label: "인공지능의 긍정적 영향을 설명함", weight: 30, keywords: ["인공지능", "긍정", "편리"], synonyms: ["효율", "의료", "교육", "생활"] },
+          { label: "윤리적 쟁점을 설명함", weight: 30, keywords: ["윤리", "쟁점", "문제"], synonyms: ["개인정보", "차별", "책임", "일자리"] },
+          { label: "행복과 삶의 질에 연결함", weight: 20, keywords: ["행복", "삶의 질", "영향"], synonyms: ["만족", "안전", "불안"] },
+          { label: "바람직한 활용 방향을 제시함", weight: 20, keywords: ["활용", "방향", "규제"], synonyms: ["책임", "제도", "공정"] }
+        ],
+        modelAnswer: "인공지능 기술은 의료 진단, 맞춤형 교육, 교통, 생활 서비스의 효율을 높여 인간의 삶을 더 편리하고 안전하게 만들 수 있다. 그러나 개인정보 침해, 알고리즘 차별, 일자리 감소, 사고 발생 시 책임 소재 같은 윤리적 쟁점도 함께 나타난다. 인공지능이 인간의 행복에 기여하려면 기술 발전 자체만을 중시할 것이 아니라 인간의 존엄, 공정성, 안전을 보장하는 제도와 책임 있는 활용 기준이 마련되어야 한다."
+      },
+      {
+        unit: "단원 종합 심화",
+        title: "서술형 33",
+        prompt: "관광 개발과 전통문화 보존이 충돌하는 상황에서 통합적 관점을 활용하여 해결 방안을 서술하시오.",
+        rubric: [
+          { label: "관광 개발의 긍정적 효과를 설명함", weight: 20, keywords: ["관광 개발", "경제", "활성화"], synonyms: ["일자리", "소득", "지역 발전"] },
+          { label: "전통문화 보존의 필요성을 설명함", weight: 25, keywords: ["전통문화", "보존", "정체성"], synonyms: ["문화유산", "지역성", "계승"] },
+          { label: "개발과 보존의 충돌을 통합적 관점에서 분석함", weight: 30, keywords: ["통합적 관점", "충돌", "분석"], synonyms: ["사회적", "윤리적", "공간적", "시간적"] },
+          { label: "구체적인 해결 방안을 제시함", weight: 25, keywords: ["해결 방안", "주민 참여", "지속 가능"], synonyms: ["규제", "협의", "균형"] }
+        ],
+        modelAnswer: "관광 개발은 지역 경제를 활성화하고 일자리와 소득을 늘리는 긍정적 효과가 있다. 그러나 개발 과정에서 전통 마을이나 문화유산이 훼손되면 지역 정체성과 역사적 가치가 약해질 수 있다. 이 문제는 경제적 이익만으로 판단할 수 없으며, 시간적 관점에서 문화유산의 역사적 가치, 공간적 관점에서 지역 환경 변화, 사회적 관점에서 주민의 삶, 윤리적 관점에서 미래 세대에 대한 책임을 함께 고려해야 한다. 해결을 위해 주민 참여를 보장하고, 전통문화 보존 구역을 설정하며, 지역 고유성을 살린 지속 가능한 관광을 추진해야 한다."
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+
+    const unitBadge = document.getElementById("unitBadge");
+    const questionTitle = document.getElementById("questionTitle");
+    const questionText = document.getElementById("questionText");
+    const answerInput = document.getElementById("answerInput");
+    const charCount = document.getElementById("charCount");
+    const gradeBtn = document.getElementById("gradeBtn");
+    const resultBox = document.getElementById("resultBox");
+    const scoreText = document.getElementById("scoreText");
+    const levelText = document.getElementById("levelText");
+    const rubricResult = document.getElementById("rubricResult");
+    const modelAnswer = document.getElementById("modelAnswer");
+    const questionList = document.getElementById("questionList");
+
+    function normalize(text) {
+      return text
+        .toLowerCase()
+        .replace(/[<>{}()[\]`"'\\]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function containsAny(answer, words) {
+      return words.some(function(word) {
+        return answer.includes(normalize(word));
+      });
+    }
+
+    function getLevel(score) {
+      if (score >= 85) return "우수";
+      if (score >= 70) return "양호";
+      if (score >= 50) return "기본";
+      return "보완 필요";
+    }
+
+    function gradeEssay(answer, rubric) {
+      const safeAnswer = normalize(answer);
+      let rubricScore = 0;
+
+      const detail = rubric.map(function(item) {
+        const hasKeyword = containsAny(safeAnswer, item.keywords);
+        const hasSynonym = containsAny(safeAnswer, item.synonyms);
+
+        let point = 0;
+        let status = "부족";
+
+        if (hasKeyword) {
+          point = item.weight;
+          status = "충족";
+        } else if (hasSynonym) {
+          point = Math.round(item.weight * 0.7);
+          status = "부분 충족";
+        }
+
+        rubricScore += point;
+
+        return {
+          label: item.label,
+          weight: item.weight,
+          point: point,
+          status: status
+        };
+      });
+
+      // 너무 짧은 답안 방지용 충실도 점수
+      const lengthScore = Math.min(10, Math.floor(safeAnswer.length / 18));
+      const finalScore = Math.min(100, rubricScore + lengthScore);
+
+      return {
+        finalScore: finalScore,
+        rubricScore: rubricScore,
+        lengthScore: lengthScore,
+        level: getLevel(finalScore),
+        detail: detail
+      };
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentQuestionIndex];
+
+      unitBadge.textContent = q.unit;
+      questionTitle.textContent = q.title;
+      questionText.textContent = q.prompt;
+      modelAnswer.textContent = q.modelAnswer;
+
+      answerInput.value = "";
+      charCount.textContent = "0 / 1200자";
+      gradeBtn.disabled = true;
+      resultBox.style.display = "none";
+      modelAnswer.style.display = "none";
+
+      renderQuestionList();
+    }
+
+    function renderQuestionList() {
+      questionList.innerHTML = "";
+
+      QUESTIONS.forEach(function(q, index) {
+        const btn = document.createElement("button");
+        btn.textContent = q.title + " - " + q.prompt.slice(0, 24) + "...";
+        if (index === currentQuestionIndex) {
+          btn.classList.add("active");
+        }
+        btn.onclick = function() {
+          currentQuestionIndex = index;
+          renderQuestion();
+        };
+        questionList.appendChild(btn);
+      });
+    }
+
+    function gradeCurrentAnswer() {
+      const q = QUESTIONS[currentQuestionIndex];
+      const answer = answerInput.value;
+      const result = gradeEssay(answer, q.rubric);
+
+      scoreText.textContent = result.finalScore + "점";
+      levelText.textContent = result.level;
+
+      rubricResult.innerHTML = "";
+
+      result.detail.forEach(function(item) {
+        const div = document.createElement("div");
+        div.className = "rubric-item";
+
+        if (item.status === "충족") {
+          div.classList.add("good");
+        } else if (item.status === "부분 충족") {
+          div.classList.add("middle");
+        } else {
+          div.classList.add("bad");
+        }
+
+        div.innerHTML =
+          "<b>" + escapeHTML(item.label) + "</b><br>" +
+          "판정: " + escapeHTML(item.status) + "<br>" +
+          "점수: " + item.point + " / " + item.weight + "점";
+
+        rubricResult.appendChild(div);
+      });
+
+      const summary = document.createElement("div");
+      summary.className = "rubric-item";
+      summary.innerHTML =
+        "<b>점수 계산</b><br>" +
+        "기준 점수 " + result.rubricScore + "점 + 답안 충실도 " + result.lengthScore + "점 = " + result.finalScore + "점";
+      rubricResult.prepend(summary);
+
+      resultBox.style.display = "block";
+    }
+
+    function resetAnswer() {
+      answerInput.value = "";
+      charCount.textContent = "0 / 1200자";
+      gradeBtn.disabled = true;
+      resultBox.style.display = "none";
+      modelAnswer.style.display = "none";
+    }
+
+    function toggleModelAnswer() {
+      if (resultBox.style.display !== "block") {
+        alert("먼저 답안을 작성하고 채점해 주세요.");
+        return;
+      }
+
+      if (modelAnswer.style.display === "block") {
+        modelAnswer.style.display = "none";
+      } else {
+        modelAnswer.style.display = "block";
+      }
+    }
+
+    function escapeHTML(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    answerInput.addEventListener("input", function() {
+      const length = answerInput.value.length;
+      charCount.textContent = length + " / 1200자";
+      gradeBtn.disabled = answerInput.value.trim().length < 20;
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
